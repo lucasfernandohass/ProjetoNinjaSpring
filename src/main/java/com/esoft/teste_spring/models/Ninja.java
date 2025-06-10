@@ -1,5 +1,7 @@
 package com.esoft.teste_spring.models;
 
+import java.util.List;
+
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -11,6 +13,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -36,7 +39,13 @@ public class Ninja {
     @Column(nullable = false)
     private int idade;
     private String cla;
-    private String vila;
+
+    @ManyToOne
+    @JoinColumn(name = "vila_id", nullable = false)
+    private Vila vila;
+
+    @ManyToMany
+    private List<Jutsu> jutsu;
 
     @ManyToOne
     @JoinColumn(name = "missao_id")
@@ -47,7 +56,6 @@ public class Ninja {
         this.nome = ninja.nome();
         this.idade = ninja.idade();
         this.cla = ninja.cla();
-        this.vila = ninja.vila();
     }
 
 }

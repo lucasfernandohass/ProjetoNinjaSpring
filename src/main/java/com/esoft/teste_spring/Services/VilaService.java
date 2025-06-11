@@ -1,17 +1,3 @@
-public VilaService Main {
-    Conversa aberta. Uma mensagem não lida.
-
-Pular para o conteúdo
-Como usar o Gmail com leitores de tela
-16 de 3.971
-Criar Classe VilaService em services
-Caixa de entrada
-
-
-Lucas Hass
-00:20 (há 19 horas)
-para mim
-
 package com.esoft.teste_spring.Services;
 
 import java.util.List;
@@ -70,7 +56,4 @@ public class VilaService{
 
         vilaRepository.deleteById(id);
     }
-}
-
-
 }

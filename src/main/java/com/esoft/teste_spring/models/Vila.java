@@ -2,6 +2,8 @@ package com.esoft.teste_spring.models;
 
 import java.util.List;
 
+import com.esoft.teste_spring.DTOs.VilaDTO;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -35,11 +37,10 @@ public class Vila {
     @OneToMany(mappedBy = "vila")
     private List<Ninja> ninjas;
 
-    /*
-     * public Vila(VilaDTO vila){
-     * this.id = vila.id();
-     * this.nome = vila.nome();
-     * this.habitantes = vila.habitantes();
-     * }
-     */
+
+    public Vila(VilaDTO vila){
+        this.id = vila.id();
+        this.nome = vila.nome();
+        this.habitantes = vila.habitantes();
+    }
 }

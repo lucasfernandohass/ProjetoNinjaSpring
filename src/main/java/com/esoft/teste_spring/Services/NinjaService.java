@@ -1,45 +1,71 @@
 package com.esoft.teste_spring.Services;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.esoft.teste_spring.DTOs.NinjaDTO;
 import com.esoft.teste_spring.Exceptions.NaoEncontradoException;
+import com.esoft.teste_spring.models.Jutsu;
 import com.esoft.teste_spring.models.Missao;
 import com.esoft.teste_spring.models.Ninja;
+import com.esoft.teste_spring.models.Vila;
+import com.esoft.teste_spring.repositories.JutsuRepository;
 import com.esoft.teste_spring.repositories.MissaoRepository;
 import com.esoft.teste_spring.repositories.NinjaRepository;
+import com.esoft.teste_spring.repositories.VilaRepository;
 
 import jakarta.transaction.Transactional;
 
 @Service
-public class NinjaService {
+public class NinjaService{
 
     private final NinjaRepository ninjaRepository;
     private final MissaoRepository missaoRepository;
+    private final VilaRepository vilaRepository;
+    private final JutsuRepository jutsuRepository;
 
-    public NinjaService(NinjaRepository ninjaRepository, MissaoRepository missaoRepository) {
+    public NinjaService(NinjaRepository ninjaRepository, MissaoRepository missaoRepository, VilaRepository vilaRepository, JutsuRepository jutsuRepository){
         this.ninjaRepository = ninjaRepository;
         this.missaoRepository = missaoRepository;
+        this.vilaRepository = vilaRepository;
+        this.jutsuRepository = jutsuRepository;
     }
 
-    public List<NinjaDTO> listar() {
+    public List<NinjaDTO> listar(){
         return ninjaRepository.findAll().stream().map(ninja -> new NinjaDTO(ninja)).toList();
     }
+    
+    @Transactional
+    public NinjaDTO salvar(NinjaDTO ninjaDTO) {
+        Ninja ninjaEntity = new Ninja();
+        ninjaEntity.setNome(ninjaDTO.nome());
+        ninjaEntity.setIdade(ninjaDTO.idade());
+        ninjaEntity.setCla(ninjaDTO.cla());
 
-    public NinjaDTO salvar(NinjaDTO ninja) {
+        if (ninjaDTO.vilaId() != null) {
+            Vila vila = vilaRepository.findById(ninjaDTO.vilaId())
+                .orElseThrow(() -> new NaoEncontradoException("Vila não encontrada"));
+            ninjaEntity.setVila(vila);
+        }
 
-        Ninja ninjaEntity = new Ninja(ninja);
-
-        if (ninja.missaoId() != null) {
-            Missao missao = missaoRepository.findById(ninja.missaoId()).orElseThrow(
-                    () -> new NaoEncontradoException("Missão com id " + ninja.missaoId() + " não foi encontrada!"));
+        if (ninjaDTO.missaoId() != null) {
+            Missao missao = missaoRepository.findById(ninjaDTO.missaoId())
+                .orElseThrow(() -> new NaoEncontradoException("Missão não encontrada"));
             ninjaEntity.setMissao(missao);
         }
 
-        return new NinjaDTO(ninjaRepository.save(ninjaEntity));
+        ninjaEntity.setJutsu(null);
+        ninjaEntity.setJutsu(null); // pode ser omitido
+        Ninja salvo = ninjaRepository.saveAndFlush(ninjaEntity); // <- força o flush, salva imediatamente no banco
+
+        if (ninjaDTO.jutsuIds() != null && !ninjaDTO.jutsuIds().isEmpty()) {
+            List<Jutsu> jutsus = jutsuRepository.findAllById(ninjaDTO.jutsuIds());
+            salvo.setJutsu(jutsus);
+            salvo = ninjaRepository.save(salvo);
+        }
+
+        return new NinjaDTO(salvo);
     }
 
     @Transactional

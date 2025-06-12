@@ -2,9 +2,6 @@ package com.esoft.teste_spring.models;
 
 import java.util.List;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import com.esoft.teste_spring.DTOs.NinjaDTO;
 
 import jakarta.persistence.Column;
@@ -13,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -44,9 +42,17 @@ public class Ninja {
     @JoinColumn(name = "vila_id", nullable = false)
     private Vila vila;
 
+    // Solução do Problema do N:N para salvar o Jutsu no Ninja
     @ManyToMany
+    @JoinTable(
+        name = "tb_ninja_jutsu",
+        joinColumns = @JoinColumn(name = "ninja_id"),
+        inverseJoinColumns = @JoinColumn(name = "jutsu_id")
+    )
     private List<Jutsu> jutsu;
 
+    @Getter
+    @Setter
     @ManyToOne
     @JoinColumn(name = "missao_id")
     private Missao missao;

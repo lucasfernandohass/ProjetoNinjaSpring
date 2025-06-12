@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.esoft.teste_spring.DTOs.MissaoDTO;
-import com.esoft.teste_spring.Exceptions.DeleteNegadoException;
 import com.esoft.teste_spring.Exceptions.NaoEncontradoException;
 import com.esoft.teste_spring.models.Missao;
 import com.esoft.teste_spring.models.Ninja;

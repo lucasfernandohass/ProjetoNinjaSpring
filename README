@@ -1,0 +1,17 @@
+--- Funcionamento do fluxo da API ---
+
+Ordem de existência para funcionar o fluxo de criação de POST:
+
+ - Jutsu
+ - Vila
+ - Ninja - Referenciar os IDs de Jutsu e Vila em seu campo
+ # Exemplo
+ {
+  "nome": "Naruto Uzumaki",
+  "idade": 17,
+  "cla": "Uzumaki",
+  "vilaId": 1,
+  "jutsuIds": [1, 2], 
+  "missaoId": id ou null
+ }
+ - Missao - Antes ou depois de ninja caso queira uma missão pronta para inserir na criação do ninja

@@ -37,19 +37,19 @@ public class NinjaService{
     }
     
     @Transactional
-    public NinjaDTO salvar(NinjaDTO ninjaDTO) {
+    public NinjaDTO salvar(NinjaDTO ninjaDTO){
         Ninja ninjaEntity = new Ninja();
         ninjaEntity.setNome(ninjaDTO.nome());
         ninjaEntity.setIdade(ninjaDTO.idade());
         ninjaEntity.setCla(ninjaDTO.cla());
 
-        if (ninjaDTO.vilaId() != null) {
+        if(ninjaDTO.vilaId() != null){
             Vila vila = vilaRepository.findById(ninjaDTO.vilaId())
                 .orElseThrow(() -> new NaoEncontradoException("Vila não encontrada"));
             ninjaEntity.setVila(vila);
         }
 
-        if (ninjaDTO.missaoId() != null) {
+        if(ninjaDTO.missaoId() != null){
             Missao missao = missaoRepository.findById(ninjaDTO.missaoId())
                 .orElseThrow(() -> new NaoEncontradoException("Missão não encontrada"));
             ninjaEntity.setMissao(missao);
@@ -59,7 +59,7 @@ public class NinjaService{
         ninjaEntity.setJutsu(null); // pode ser omitido
         Ninja salvo = ninjaRepository.saveAndFlush(ninjaEntity); // <- força o flush, salva imediatamente no banco
 
-        if (ninjaDTO.jutsuIds() != null && !ninjaDTO.jutsuIds().isEmpty()) {
+        if(ninjaDTO.jutsuIds() != null && !ninjaDTO.jutsuIds().isEmpty()){
             List<Jutsu> jutsus = jutsuRepository.findAllById(ninjaDTO.jutsuIds());
             salvo.setJutsu(jutsus);
             salvo = ninjaRepository.save(salvo);
@@ -69,27 +69,48 @@ public class NinjaService{
     }
 
     @Transactional
-    public NinjaDTO salvar(Long id, NinjaDTO ninja) {
-        ninjaRepository.findById(id)
+    public NinjaDTO salvar(Long id, NinjaDTO ninjaDTO) {
+        Ninja ninjaEntity = ninjaRepository.findById(id)
                 .orElseThrow(() -> new NaoEncontradoException("Ninja com id " + id + " não foi encontrado!"));
 
-        Ninja ninjaEntity = new Ninja(ninja);
-        ninjaEntity.setId(id);
+        ninjaEntity.setNome(ninjaDTO.nome());
+        ninjaEntity.setIdade(ninjaDTO.idade());
+        ninjaEntity.setCla(ninjaDTO.cla());
 
-        if (ninja.missaoId() != null) {
-            Missao missao = missaoRepository.findById(ninja.missaoId()).orElse(null);
-            ninjaEntity.setMissao(missao);
+        if (ninjaDTO.vilaId() != null) {
+            Vila vila = vilaRepository.findById(ninjaDTO.vilaId())
+                .orElseThrow(() -> new NaoEncontradoException("Vila não encontrada"));
+            ninjaEntity.setVila(vila);
+        } else {
+            throw new IllegalArgumentException("Vila não pode ser nula");
         }
 
-        return new NinjaDTO(ninjaRepository.save(ninjaEntity));
+        if (ninjaDTO.missaoId() != null) {
+            Missao missao = missaoRepository.findById(ninjaDTO.missaoId())
+                .orElse(null);
+            ninjaEntity.setMissao(missao);
+        } else {
+            ninjaEntity.setMissao(null);
+        }
+
+        if (ninjaDTO.jutsuIds() != null && !ninjaDTO.jutsuIds().isEmpty()) {
+            var jutsus = jutsuRepository.findAllById(ninjaDTO.jutsuIds());
+            ninjaEntity.setJutsu(jutsus);
+        } else {
+            ninjaEntity.setJutsu(null);
+        }
+
+        ninjaEntity = ninjaRepository.save(ninjaEntity);
+
+        return new NinjaDTO(ninjaEntity);
     }
 
-    public NinjaDTO buscarPorId(Long id) {
+    public NinjaDTO buscarPorId(Long id){
         return new NinjaDTO(ninjaRepository.findById(id)
                 .orElseThrow(() -> new NaoEncontradoException("Ninja com id " + id + " não foi encontrado!")));
     }
 
-    public void deletar(Long id) {
+    public void deletar(Long id){
         ninjaRepository.findById(id)
                 .orElseThrow(() -> new NaoEncontradoException("Ninja com id " + id + " não foi encontrado!"));
         ninjaRepository.deleteById(id);
